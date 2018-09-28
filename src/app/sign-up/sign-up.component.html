@@ -3,10 +3,10 @@
 
   <div class="card-body">
     <form
+      class="form-horizontal"
       novalidate
-      autocomplete="off"
-      #signupForm="ngForm"
-      (ngSubmit)="onSubmit(signupForm)">
+      (ngSubmit)="onSubmit()"
+      [formGroup]="signupForm">
       <div class="row form-group">
         <label class="col-md-2 col-form-label" for="firstname">First Name</label>
         <div class="col-md-8">
@@ -15,15 +15,15 @@
             class="form-control"
             id="firstname"
             placeholder="First Name (required)"
-            name="firstname"
-            [(ngModel)]="user.firstname"
             required
             minlength="3"
-            #firstname="ngModel"
-            [ngClass]="{'is-invalid': (firstname.touched || firstname.dirty) && firstname.invalid }" >
+            formControlName="firstname"
+            [ngClass]="{'is-invalid': (signupForm.get('firstname').touched ||
+                                      signupForm.get('firstname').dirty) &&
+                                      signupForm.get('firstname').invalid }" >
             <span class="invalid-feedback">
-              <span *ngIf="firstname.errors?.required">Please enter your first name.</span>
-              <span *ngIf="firstname.errors?.minlength">The first name must be longer than 3 characters.</span>
+              <span *ngIf="signupForm.get('firstname').hasError('required')">Please enter your first name.</span>
+              <span *ngIf="signupForm.get('firstname').hasError('minlength')">The first name must be longer than 3 characters.</span>
             </span>
         </div>
       </div>
@@ -36,13 +36,13 @@
             class="form-control"
             id="lastname"
             placeholder="Last Name (required)"
-            name="lastname"
             required
-            [(ngModel)]="user.lastname"
-            #lastname="ngModel"
-            [ngClass]="{'is-invalid': (lastname.touched || lastname.dirty) && lastname.invalid}">
+            formControlName="lastname"
+            [ngClass]="{'is-invalid': (signupForm.get('lastname').touched ||
+                                      signupForm.get('lastname').dirty) &&
+                                      signupForm.get('lastname').invalid }" >
             <span class="invalid-feedback">
-              <span *ngIf="lastname.errors?.required">Please enter your last name.</span>
+              <span *ngIf="signupForm.get('lastname').hasError('required')">Please enter your last name.</span>
             </span>
         </div>
       </div>
@@ -55,15 +55,15 @@
             class="form-control"
             id="email"
             placeholder="Email (required)"
-            name="email"
             email
             required
-            [(ngModel)]="user.email"
-            #email="ngModel"
-            [ngClass]="{'is-invalid': (email.touched || email.dirty) && email.invalid}">
+            formControlName="email"
+            [ngClass]="{'is-invalid': (signupForm.get('email').touched ||
+                                      signupForm.get('email').dirty) &&
+                                      signupForm.get('email').invalid}">
             <span class="invalid-feedback">
-              <span *ngIf="email.errors?.required">Please enter your email address.</span>
-              <span *ngIf="email.errors?.email">Please enter a valid email address.</span>
+              <span *ngIf="signupForm.get('email').hasError('required')">Please enter your email address.</span>
+              <span *ngIf="signupForm.get('email').hasError('email')">Please enter a valid email address.</span>
             </span>
         </div>
       </div>
@@ -76,14 +76,13 @@
                 type="checkbox"
                 class="form-check-input"
                 id="sendCatalog"
-                name="sendCatalog"
-                [(ngModel)]="user.sendCatalog"> Send me your catalog
+                formControlName="sendCatalog"> Send me your catalog
             </label>
           </div>
         </div>
       </div>
 
-      <div *ngIf="user.sendCatalog" >
+      <!-- <div *ngIf="user.sendCatalog" >
         <div class="row form-group">
           <label class="col-md-2 col-form-label pt-0">Address Type</label>
           <div class="col-md-8">
@@ -191,14 +190,22 @@
                 [(ngModel)]="user.zip">
           </div>
         </div>
-      </div>
+      </div> -->
 
       <div class="row form-group">
-        <div class="col-md-4">
+        <div class="col-md-8 offset-md-2">
           <button
             type="submit"
-            class="btn btn-primary"
+            class="btn btn-primary mr-1"
             [disabled]="signupForm.invalid">Sign Up</button>
+          <button
+            type="button"
+            class="btn btn-outline-success mr-1"
+            (click)="onSuperUser()">Super User</button>
+          <button
+            type="button"
+            class="btn btn-outline-warning"
+            (click)="onSuperUser()">Set Default Name</button>
         </div>
       </div>
     </form>
