@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 import { User } from './user.model';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import * as CustomValidators from './custom-validators';
 
 @Component({
   selector: 'app-sign-up',
@@ -15,10 +17,16 @@ export class SignUpComponent implements OnInit {
 
   ngOnInit() {
     this.signupForm = this.fb.group({
-      firstname: '',
-      lastname: '',
-      email: '',
-      sendCatalog: true,
+      firstname: ['', [Validators.required, Validators.minLength(3)]],
+      lastname: ['', [Validators.required, Validators.maxLength(30)]],
+      emailGroup: this.fb.group({
+        email: ['', [Validators.required, Validators.email]],
+        confirmEmail: ['', Validators.required]
+      }, { validator: CustomValidators.emailMatcher }),
+      phone: '',
+      notification: 'email',
+      rating: ['', CustomValidators.ratingRange(1, 5)],
+      sendCatalog: true
     })
   }
 
@@ -31,15 +39,31 @@ export class SignUpComponent implements OnInit {
     this.signupForm.setValue({
       firstname: 'Marko',
       lastname: 'Bojic',
-      email: 'bojic.marko021@gmail.com',
+      emailGroup: {
+        email: 'bojic.marko021@gmail.com',
+        confirmEmail: 'bojic.marko021@gmail.com'
+      },
+      phone: '',
+      notification: 'email',
+      rating: '',
       sendCatalog: false,
     })
   }
 
   onSetDefaultName() {
     this.signupForm.patchValue({
-      firstname: 'Marko'
+      firstname: 'Jedi'
     })
+  }
+
+  setNotification(notifyVia: string): void {
+    const phoneControl = this.signupForm.get('phone');
+    if (notifyVia === 'text') {
+      phoneControl.setValidators(Validators.required);
+    } else {
+      phoneControl.clearValidators();
+    }
+    phoneControl.updateValueAndValidity();
   }
 
 }

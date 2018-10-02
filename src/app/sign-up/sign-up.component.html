@@ -15,8 +15,6 @@
             class="form-control"
             id="firstname"
             placeholder="First Name (required)"
-            required
-            minlength="3"
             formControlName="firstname"
             [ngClass]="{'is-invalid': (signupForm.get('firstname').touched ||
                                       signupForm.get('firstname').dirty) &&
@@ -36,34 +34,117 @@
             class="form-control"
             id="lastname"
             placeholder="Last Name (required)"
-            required
             formControlName="lastname"
             [ngClass]="{'is-invalid': (signupForm.get('lastname').touched ||
                                       signupForm.get('lastname').dirty) &&
                                       signupForm.get('lastname').invalid }" >
             <span class="invalid-feedback">
               <span *ngIf="signupForm.get('lastname').hasError('required')">Please enter your last name.</span>
+              <span *ngIf="signupForm.get('lastname').hasError('maxlength')">The last name can not be longer than 30 characters.</span>
             </span>
         </div>
       </div>
 
+      <div formGroupName="emailGroup">
+        <div class="row form-group">
+          <label class="col-md-2 col-form-label" for="email">Email</label>
+          <div class="col-md-8">
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              placeholder="Email (required)"
+              formControlName="email"
+              [ngClass]="{'is-invalid': signupForm.get('emailGroup').errors ||
+                                        ((signupForm.get('emailGroup.email').touched ||
+                                        signupForm.get('emailGroup.email').dirty) &&
+                                        signupForm.get('emailGroup.email').invalid)}">
+              <span class="invalid-feedback">
+                <span *ngIf="signupForm.get('emailGroup.email').hasError('required')">Please enter your email address.</span>
+                <span *ngIf="signupForm.get('emailGroup.email').hasError('email')">Please enter a valid email address.</span>
+              </span>
+          </div>
+        </div>
+        <div class="row form-group">
+          <label class="col-md-2 col-form-label" for="confirmEmail">Confirm Email</label>
+          <div class="col-md-8">
+            <input
+              type="email"
+              class="form-control"
+              id="confirmEmail"
+              placeholder="Confirm Email (required)"
+              formControlName="confirmEmail"
+              [ngClass]="{'is-invalid': signupForm.get('emailGroup').errors ||
+                                        ((signupForm.get('emailGroup.confirmEmail').touched ||
+                                        signupForm.get('emailGroup.confirmEmail').dirty) &&
+                                        signupForm.get('emailGroup.confirmEmail').invalid)}">
+              <span class="invalid-feedback">
+                <span *ngIf="signupForm.get('emailGroup.confirmEmail').hasError('required')">Please confirm your email address.</span>
+                <span *ngIf="signupForm.get('emailGroup').hasError('match')">The confirmation does not match the email address.</span>
+              </span>
+          </div>
+        </div>
+      </div>
+
       <div class="row form-group">
-        <label class="col-md-2 col-form-label" for="email">Email</label>
+        <label class="col-md-2 col-form-label" for="phone">Phone</label>
         <div class="col-md-8">
           <input
-            type="email"
+            type="tel"
             class="form-control"
-            id="email"
-            placeholder="Email (required)"
-            email
-            required
-            formControlName="email"
-            [ngClass]="{'is-invalid': (signupForm.get('email').touched ||
-                                      signupForm.get('email').dirty) &&
-                                      signupForm.get('email').invalid}">
+            id="phone"
+            placeholder="Phone"
+            formControlName="phone"
+            [ngClass]="{'is-invalid': signupForm.get('phone').invalid}" >
             <span class="invalid-feedback">
-              <span *ngIf="signupForm.get('email').hasError('required')">Please enter your email address.</span>
-              <span *ngIf="signupForm.get('email').hasError('email')">Please enter a valid email address.</span>
+              <span *ngIf="signupForm.get('phone').hasError('required')" >
+                Please enter your phone number.
+              </span>
+            </span>
+        </div>
+      </div>
+
+      <div class="row form group">
+        <div class="col-md-2 col-form-label pt-0">Send Notification</div>
+        <div class="col-md-8">
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input
+                type="radio"
+                class="form-check-input"
+                value="email"
+                formControlName="notification"
+                (click)="setNotification('email')">
+            </label> Email
+          </div>
+          <div class="form-check form-check-inline">
+            <label class="form-check-label">
+              <input
+                type="radio"
+                class="form-check-input"
+                value="text"
+                formControlName="notification"
+                (click)="setNotification('text')">
+            </label> Text
+          </div>
+        </div>
+      </div>
+
+      <div class="row form-group">
+        <label for="rating" class="col-md-2 col-form-label">Rating</label>
+        <div class="col-md-8">
+          <input
+            type="number"
+            class="form-control"
+            id="rating"
+            formControlName="rating"
+            [ngClass]="{'is-invalid': (signupForm.get('rating').touched ||
+                                      signupForm.get('rating').dirty)
+                                      && signupForm.get('rating').invalid}">
+            <span class="invalid-feedback">
+              <span *ngIf="signupForm.get('rating').hasError('range')" >
+                Please enter your experience from 1 to 5
+              </span>
             </span>
         </div>
       </div>
@@ -205,7 +286,7 @@
           <button
             type="button"
             class="btn btn-outline-warning"
-            (click)="onSuperUser()">Set Default Name</button>
+            (click)="onSetDefaultName()">Set Default Name</button>
         </div>
       </div>
     </form>
