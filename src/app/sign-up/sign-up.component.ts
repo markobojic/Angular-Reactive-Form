@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, FormArray } from '@angular/forms';
 import { debounceTime } from 'rxjs/operators';
 
 import { User } from './user.model';
@@ -12,7 +12,6 @@ import * as CustomValidators from './custom-validators';
 })
 export class SignUpComponent implements OnInit {
   signupForm: FormGroup;
-  user = new User();
 
   // Reactive approach for validation messages ( Refactor later )
   emailMessage: string;
@@ -21,6 +20,10 @@ export class SignUpComponent implements OnInit {
     email: 'Please enter a valid email address'
   }
   // Reactive approach for validation messages
+
+  get addresses(): FormArray {
+    return <FormArray>this.signupForm.get('addresses');
+  }
 
   constructor(private fb: FormBuilder) { }
 
@@ -35,7 +38,8 @@ export class SignUpComponent implements OnInit {
       phone: '',
       notification: 'email',
       rating: ['', CustomValidators.ratingRange(1, 5)],
-      sendCatalog: true
+      sendCatalog: true,
+      addresses: this.fb.array([ this.buildAddress()])
     });
 
     this.signupForm
@@ -49,30 +53,45 @@ export class SignUpComponent implements OnInit {
       .subscribe((value) => this.setMessage(emailControl));
   }
 
+  buildAddress(): FormGroup {
+    return this.fb.group({
+      addressType: 'home',
+      street1: '',
+      street2: '',
+      city: '',
+      state: '',
+      zip: ''
+    })
+  }
+
+  addAddress(): void {
+    this.addresses.push(this.buildAddress());
+  }
+
   onSubmit() {
     console.log(this.signupForm);
     console.log(`Saved ${JSON.stringify(this.signupForm.value)}`);
   }
 
   onSuperUser() {
-    this.signupForm.setValue({
+    this.signupForm.patchValue({
       firstname: 'Marko',
       lastname: 'Bojic',
       emailGroup: {
         email: 'bojic.marko021@gmail.com',
         confirmEmail: 'bojic.marko021@gmail.com'
       },
-      phone: '',
-      notification: 'email',
-      rating: '',
-      sendCatalog: false,
+      rating: 5
+    });
+    const addressGroup = this.fb.group({
+      addressType: 'home',
+      street1: 'ZJ 16',
+      street2: 'VM 64',
+      city: 'Novi Sad',
+      state: 'SR',
+      zip: '21000'
     })
-  }
-
-  onSetDefaultName() {
-    this.signupForm.patchValue({
-      firstname: 'Jedi'
-    })
+    this.signupForm.setControl('addresses', this.fb.array([addressGroup]));
   }
 
   setNotification(notifyVia: string): void {
