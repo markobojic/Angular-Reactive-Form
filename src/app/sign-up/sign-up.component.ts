@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
+import { debounceTime } from 'rxjs/operators';
 
 import { User } from './user.model';
 import * as CustomValidators from './custom-validators';
@@ -12,6 +13,14 @@ import * as CustomValidators from './custom-validators';
 export class SignUpComponent implements OnInit {
   signupForm: FormGroup;
   user = new User();
+
+  // Reactive approach for validation messages ( Refactor later )
+  emailMessage: string;
+  private validationMessages = {
+    required: 'Please enter your email address',
+    email: 'Please enter a valid email address'
+  }
+  // Reactive approach for validation messages
 
   constructor(private fb: FormBuilder) { }
 
@@ -27,7 +36,17 @@ export class SignUpComponent implements OnInit {
       notification: 'email',
       rating: ['', CustomValidators.ratingRange(1, 5)],
       sendCatalog: true
-    })
+    });
+
+    this.signupForm
+      .get('notification')
+      .valueChanges
+      .subscribe((value: string) => this.setNotification(value));
+
+  // Reactive approach for validation messages for email Control ( Refactor later for other controls)
+    const emailControl = this.signupForm.get('emailGroup.email');
+    emailControl.valueChanges.pipe(debounceTime(1000))
+      .subscribe((value) => this.setMessage(emailControl));
   }
 
   onSubmit() {
@@ -64,6 +83,16 @@ export class SignUpComponent implements OnInit {
       phoneControl.clearValidators();
     }
     phoneControl.updateValueAndValidity();
+  }
+
+  // Reactive approach for setting validation messages for email Control ( Refactor later for other controls )
+  setMessage(c: AbstractControl): void {
+    this.emailMessage = '';
+    if ((c.touched || c.dirty) && c.errors) {
+      console.log(c.errors);
+      this.emailMessage = Object.keys(c.errors).map(key =>
+        this.validationMessages[key]).join(' ');
+    }
   }
 
 }
